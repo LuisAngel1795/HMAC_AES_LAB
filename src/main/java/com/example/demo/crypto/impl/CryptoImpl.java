@@ -65,7 +65,6 @@ public class CryptoImpl {
 
     }
 
-
     private Llaves getLlaves(HttpHeaders headers) throws Exception {
         Llaves llaves = null;
         validarIdAcceso(headers);
@@ -83,28 +82,26 @@ public class CryptoImpl {
         return llaves;
     }
 
-    private void decrypt(Llaves llaves, Object body) {
+    private void decrypt(Llaves llaves, Object body) throws Exception{
         Llaves llavesEncypt = new Llaves();
 
         llavesEncypt.setAccesoSimetrico(llaves.getAccesoSimetrico());
         llavesEncypt.setCodigoAutentificacionHash(llaves.getCodigoAutentificacionHash());
         try {
-            EncryptDecrypt.decrypt(body, llavesEncypt);
+            cryptoUtil.decrypt(body, llavesEncypt);
         }catch (Exception e) {
-            throw new ApiException(List.of("Error al desencriptar la data"), EExceptionInfo.E400);
+            throw new Exception("error al desencriptar la data");
         }
     }
 
-    private void encrypt(Llaves llaves, Object body) {
+    private void encrypt(Llaves llaves, Object body){
         Llaves llavesEncypt = new Llaves();
         llavesEncypt.setAccesoSimetrico(llaves.getAccesoSimetrico());
         llavesEncypt.setCodigoAutentificacionHash(llaves.getCodigoAutentificacionHash());
-        EncryptDecrypt.encrypt(body, llavesEncypt);
+        cryptoUtil.encrypt(body, llavesEncypt);
     }
 
     private void validarIdAcceso(HttpHeaders headers) throws Exception {
-//        String error = "Parametro " + X_ID_ACCESO + " incorrecto";
-
         if (ObjectUtils.isEmpty(headers.getFirst(ID_ACCESO_HEADER))) {
             throw new Exception("error, no existe el idAcceso");
         }
